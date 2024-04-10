@@ -1,8 +1,12 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, Fragment } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import SearchBar from './Components/SearchBar'
 import Gallery from './Components/Gallery'
 import { DataContext } from './Context/DataContext'
 import { SearchContext } from './Context/SearchContext'
+import ArtistView from './Components/ArtistView'
+import AlbumView from './Components/AlbumView'
 
 
 function App() {
@@ -30,36 +34,45 @@ function App() {
 
   return (
     <div>
-      <SearchContext.Provider value={{
-        term: searchInput,
-        handleSearch: handleSearch
-      }}>
-        <SearchBar handleSearch={handleSearch} />
-      </SearchContext.Provider>
       {message}
-      
-      <DataContext.Provider value={data}>
-        <Gallery />
-      </DataContext.Provider>
+      <Router>
+        <Routes>
+          <Route path='/' element={
+            <Fragment>
+              <SearchContext.Provider value={{
+                term: searchInput,
+                handleSearch: handleSearch
+              }}>
+                <SearchBar handleSearch={handleSearch} />
+              </SearchContext.Provider>
+              <DataContext.Provider value={data}>
+                <Gallery />
+              </DataContext.Provider>
+            </Fragment>
+          } />
+          <Route path='/album/:id' element={<AlbumView />} />
+          <Route path='/artist/:id' element={<ArtistView />} />
+        </Routes>
+      </Router>
     </div>
   );
 }
-    // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const url = encodeURI(`https://itunes.apple.com/search?term=${search}`)
-  //     console.log(url)
-  //     const response = await fetch(url)
-  //     const data = await response.json()
-  //     console.log(data)
+// useEffect(() => {
+//   const fetchData = async () => {
+//     const url = encodeURI(`https://itunes.apple.com/search?term=${search}`)
+//     console.log(url)
+//     const response = await fetch(url)
+//     const data = await response.json()
+//     console.log(data)
 
-  //     if (data.results.length) {
-  //       setData(data.results)
-  //     } else {
-  //       setMessage('Not Found')
-  //     }
-  //   }
+//     if (data.results.length) {
+//       setData(data.results)
+//     } else {
+//       setMessage('Not Found')
+//     }
+//   }
 
-  //   if (search) fetchData()
-  // }, [search])
+//   if (search) fetchData()
+// }, [search])
 
 export default App;
