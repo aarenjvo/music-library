@@ -1,19 +1,18 @@
-import { useState, useRef, Fragment } from 'react'
+import { useState, useEffect, Suspense, useRef, Fragment } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { useParams } from 'react-router-dom'
 import SearchBar from './Components/SearchBar'
 import Gallery from './Components/Gallery'
 import { DataContext } from './Context/DataContext'
 import { SearchContext } from './Context/SearchContext'
 import ArtistView from './Components/ArtistView'
 import AlbumView from './Components/AlbumView'
-
+// import Spinner from './Components/Spinner'
 
 function App() {
-  // const [search, setSearch] = useState('')
-  const [message, setMessage] = useState('Search for Music!')
-  const [data, setData] = useState([])
   let searchInput = useRef('')
+  const [message, setMessage] = useState('Search for Music!')
+  const [data, setData] = useState(null)
+
 
   const handleSearch = async (e, term) => {
     e.preventDefault()
@@ -32,21 +31,31 @@ function App() {
     fetchData()
   }
 
+  const renderGallery = () => {
+    if (data) {
+      return (
+        <Suspense fallback={<Spinner />}>
+          <Gallery data={data} />
+        </Suspense>
+      )
+    }
+  }
+
   return (
     <div>
       {message}
       <Router>
         <Routes>
-          <Route path='/' element={
+          <Route exact path='/' element={
             <Fragment>
               <SearchContext.Provider value={{
                 term: searchInput,
                 handleSearch: handleSearch
               }}>
-                <SearchBar handleSearch={handleSearch} />
+                <SearchBar handleSearch={handleSearch}/>
               </SearchContext.Provider>
               <DataContext.Provider value={data}>
-                <Gallery />
+              {renderGallery()}
               </DataContext.Provider>
             </Fragment>
           } />
@@ -57,22 +66,5 @@ function App() {
     </div>
   );
 }
-// useEffect(() => {
-//   const fetchData = async () => {
-//     const url = encodeURI(`https://itunes.apple.com/search?term=${search}`)
-//     console.log(url)
-//     const response = await fetch(url)
-//     const data = await response.json()
-//     console.log(data)
-
-//     if (data.results.length) {
-//       setData(data.results)
-//     } else {
-//       setMessage('Not Found')
-//     }
-//   }
-
-//   if (search) fetchData()
-// }, [search])
 
 export default App;

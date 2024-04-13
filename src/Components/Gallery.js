@@ -2,8 +2,10 @@ import { useContext } from 'react'
 import { DataContext } from '../Context/DataContext'
 import GalleryItem from './GalleryItem'
 
-function Gallery() {
+const Gallery = () => {
     const data = useContext(DataContext)
+    // const myData = data.result.read()
+    // const data = props.data.result.read()
     const display = data.map((item, i) => {
         return <GalleryItem key={i} item={item} />
     })
