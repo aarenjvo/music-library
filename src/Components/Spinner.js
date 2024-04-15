@@ -1,4 +1,5 @@
 import loading_spinner from '../loading_spinner.gif'
+import React from 'react'
 
 const Spinner = () => {
     return (

@@ -1,17 +1,26 @@
-import { useState, useEffect, Suspense, useRef, Fragment } from 'react'
+import { useState, useEffect, Suspense, useRef, Fragment, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import SearchBar from './Components/SearchBar'
-import Gallery from './Components/Gallery'
 import { DataContext } from './Context/DataContext'
 import { SearchContext } from './Context/SearchContext'
 import ArtistView from './Components/ArtistView'
 import AlbumView from './Components/AlbumView'
-// import Spinner from './Components/Spinner'
+import { createResource as fetchTheData } from './helper'
+import Spinner from './Components/Spinner'
+import './App.css'
 
 function App() {
+
   let searchInput = useRef('')
   const [message, setMessage] = useState('Search for Music!')
   const [data, setData] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
+
+  useEffect(() => {
+    if (searchTerm) {
+      setData(fetchTheData(searchTerm))
+    }
+  }, [searchTerm])
 
 
   const handleSearch = async (e, term) => {
@@ -31,6 +40,8 @@ function App() {
     fetchData()
   }
 
+  const Gallery = lazy(() => import('./Components/Gallery'))
+
   const renderGallery = () => {
     if (data) {
       return (
@@ -38,11 +49,17 @@ function App() {
           <Gallery data={data} />
         </Suspense>
       )
-    }
-  }
+  } 
+  // return (
+  //   <div>
+  //   <Spinner />
+  //   Testing if Spinner component render
+  //   </div>
+  // )
+}
 
   return (
-    <div>
+    <div className='App'>
       {message}
       <Router>
         <Routes>
@@ -56,7 +73,7 @@ function App() {
               </SearchContext.Provider>
               <DataContext.Provider value={data}>
               {renderGallery()}
-              </DataContext.Provider>
+              </DataContext.Provider>     
             </Fragment>
           } />
           <Route path='/album/:id' element={<AlbumView />} />
@@ -66,5 +83,6 @@ function App() {
     </div>
   );
 }
+
 
 export default App;
